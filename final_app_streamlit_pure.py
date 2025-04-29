@@ -29,6 +29,7 @@ ax1.set_title('Passenger Satisfaction Distribution by Travel Class')
 ax1.set_xlabel('Satisfaction')
 ax1.set_ylabel('Count')
 st.pyplot(fig1)
+plt.close(fig1)
 
 # Additional visualizations can be added similarly following the Colab notebook
 # --- Visualization 2: Departure Delay vs Satisfaction (Enhanced Plotly Version) ---
@@ -52,6 +53,8 @@ ax2.set_ylabel('Satisfaction Score', fontsize=14)
 ax2.legend(title='Travel Class')
 ax2.grid(True, linestyle='--', alpha=0.5)
 st.pyplot(fig2)
+plt.close(fig2)
+
 
 # --- Visualization 3: Arrival Delay Impact (Violin, Interactive Plotly Version) ---
 st.subheader("Visualization 3: Arrival Delay Impact on Satisfaction")
@@ -83,6 +86,8 @@ fig3.update_layout(
 
 fig3.update_traces(meanline_visible=True)
 st.plotly_chart(fig3)
+plt.close(fig3)
+
 
 # --- Visualization 4: High Delay but Still Satisfied (Anomaly Highlight) ---
 st.subheader("Visualization 4: High Delay but Still Satisfied (Anomalies)")
@@ -115,6 +120,8 @@ fig4.add_scatter(
 )
 
 st.plotly_chart(fig4)
+plt.close(fig4)
+
 
 # --- Visualization 5: Interactive Correlation Heatmap of Service Features ---
 
@@ -147,4 +154,6 @@ fig5.update_layout(
 )
 
 st.plotly_chart(fig5)
+plt.close(fig5)
+
 
