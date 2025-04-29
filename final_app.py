@@ -116,7 +116,6 @@ sns.histplot(
 ax2.title('Passenger Satisfaction Distribution by Travel Class')
 ax2.xlabel('Satisfaction')
 ax2.ylabel('Count')
-ax2.
 
 
 
