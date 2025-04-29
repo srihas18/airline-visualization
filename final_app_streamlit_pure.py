@@ -28,3 +28,34 @@ ax1.set_ylabel('Count')
 st.pyplot(fig1)
 
 # Additional visualizations can be added similarly following the Colab notebook
+st.subheader("Visualization 2: Departure Delay vs Satisfaction")
+fig2, ax2 = plt.subplots(figsize=(10,6))
+sns.scatterplot(
+    data=df,
+    x='Departure Delay',
+    y='Satisfaction',
+    hue='Class',
+    palette='Set2',
+    ax=ax2
+)
+ax2.set_title('Impact of Departure Delay on Passenger Satisfaction')
+ax2.set_xlabel('Departure Delay (Minutes)')
+ax2.set_ylabel('Satisfaction')
+st.pyplot(fig2)
+
+#3
+
+st.subheader("Visualization 3: Arrival Delay Impact on Satisfaction")
+fig3, ax3 = plt.subplots(figsize=(10,6))
+sns.violinplot(
+    data=df,
+    x='Satisfaction',
+    y='Arrival Delay',
+    palette='Set2',
+    ax=ax3
+)
+ax3.set_title('Arrival Delay Impact on Satisfaction')
+ax3.set_xlabel('Satisfaction')
+ax3.set_ylabel('Arrival Delay (Minutes)')
+st.pyplot(fig3)
+
