@@ -96,7 +96,7 @@ st.markdown('<div class="chart-section">', unsafe_allow_html=True)
 st.subheader("Visualization 3: Arrival Delay vs Satisfaction Distribution")
 
 fig3, ax3 = plt.subplots(figsize=(10,6))
-sns.violinplot(data=df, x='Satisfaction', y='Arrival Delay in Minutes', palette='muted', ax=ax3)
+sns.violinplot(data=df, x='Satisfaction', y='Arrival Delay', palette='muted', ax=ax3)
 ax3.set_title('Arrival Delay Impact on Satisfaction')
 ax3.set_xlabel('Satisfaction')
 ax3.set_ylabel('Arrival Delay (Minutes)')
