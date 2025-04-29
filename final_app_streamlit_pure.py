@@ -1,3 +1,12 @@
+import os
+
+st.write("Files available:", os.listdir())
+
+try:
+    df = pd.read_csv('your_dataset.csv')
+    st.success("CSV loaded successfully!")
+except Exception as e:
+    st.error(f"Failed to load CSV: {e}")
 
 import streamlit as st
 import pandas as pd
