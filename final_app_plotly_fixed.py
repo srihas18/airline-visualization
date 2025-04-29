@@ -3,6 +3,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
+from scipy.stats 
+import gaussian_kde
+
 
 st.set_page_config(page_title="Decoding Passenger Satisfaction", page_icon="✈️", layout="wide")
 
@@ -16,9 +20,6 @@ df.columns = df.columns.str.strip()  # Clean column names
 colors = px.colors.qualitative.Set2
 
 # Visualization 1: Satisfaction Distribution by Class (Histogram + KDE)
-import numpy as np
-from scipy.stats import gaussian_kde
-
 st.subheader("Visualization 1: Passenger Satisfaction Distribution by Travel Class")
 
 # Set up figure
