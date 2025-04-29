@@ -33,6 +33,7 @@ plt.close(fig1)
 
 # Additional visualizations can be added similarly following the Colab notebook
 # --- Visualization 2: Departure Delay vs Satisfaction (Enhanced Plotly Version) ---
+scatter_df = df.dropna(subset=['Departure Delay', 'Satisfaction', 'Class'])  # <-- clean
 
 st.subheader("Visualization 2: Departure Delay vs Satisfaction")
 fig2, ax2 = plt.subplots(figsize=(12, 7))
