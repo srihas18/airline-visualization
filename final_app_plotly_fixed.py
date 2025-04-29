@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
-from scipy
+from scipy.stats
 import gaussian_kde
 
 
