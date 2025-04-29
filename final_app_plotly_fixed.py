@@ -16,30 +16,60 @@ df.columns = df.columns.str.strip()  # Clean column names
 colors = px.colors.qualitative.Set2
 
 # Visualization 1: Satisfaction Distribution by Class (Histogram + KDE)
-st.subheader("Visualization 1: Satisfaction Distribution by Travel Class")
-fig1 = go.Figure()
+import numpy as np
+from scipy.stats import gaussian_kde
 
-for idx, cls in enumerate(df['Class'].dropna().unique()):
+st.subheader("Visualization 1: Passenger Satisfaction Distribution by Travel Class")
+
+# Set up figure
+fig = go.Figure()
+
+# Set2 colors manually
+set2_colors = ['#66c2a5', '#fc8d62', '#8da0cb']
+
+classes = df['Class'].dropna().unique()
+
+# Add dodged histograms
+for idx, cls in enumerate(classes):
     subset = df[df['Class'] == cls]
-    fig1.add_trace(go.Histogram(
+    fig.add_trace(go.Histogram(
         x=subset['Satisfaction'],
         name=cls,
-        marker_color=colors[idx],
-        opacity=0.6,
-        histnorm='density',
-        nbinsx=30
+        opacity=0.7,
+        marker_color=set2_colors[idx],
+        nbinsx=30,
+        bingroup=idx
     ))
 
-fig1.update_layout(
+# Add KDE lines manually
+for idx, cls in enumerate(classes):
+    subset = df[df['Class'] == cls]['Satisfaction'].dropna()
+    if len(subset) > 1:
+        kde = gaussian_kde(subset)
+        x_vals = np.linspace(subset.min(), subset.max(), 100)
+        y_vals = kde(x_vals) * len(subset) * (subset.max() - subset.min()) / 30
+        fig.add_trace(go.Scatter(
+            x=x_vals,
+            y=y_vals,
+            mode='lines',
+            name=f"{cls} KDE",
+            line=dict(color=set2_colors[idx], width=2, dash='dot'),
+            showlegend=False
+        ))
+
+# Update layout
+fig.update_layout(
+    title="Passenger Satisfaction Distribution by Travel Class",
+    xaxis_title="Satisfaction",
+    yaxis_title="Count",
     barmode='overlay',
-    title_text='Passenger Satisfaction Distribution by Travel Class',
-    xaxis_title_text='Satisfaction',
-    yaxis_title_text='Density',
     template='simple_white',
     width=800,
-    height=500
+    height=600
 )
-st.plotly_chart(fig1)
+
+st.plotly_chart(fig)
+
 
 # Visualization 2: Departure Delay vs Satisfaction (Scatter)
 st.subheader("Visualization 2: Departure Delay vs Satisfaction")
