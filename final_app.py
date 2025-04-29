@@ -82,7 +82,7 @@ st.markdown('<div class="chart-section">', unsafe_allow_html=True)
 st.subheader("Visualization 2: Departure Delay vs Satisfaction")
 
 fig2, ax2 = plt.subplots(figsize=(10,6))
-sns.scatterplot(data=df, x='Departure Delay in Minutes', y='Satisfaction', hue='Class', palette='Set1', alpha=0.6, ax=ax2)
+sns.scatterplot(data=df, x='Departure Delay', y='Satisfaction', hue='Class', palette='Set1', alpha=0.6, ax=ax2)
 ax2.set_title('Departure Delay vs Passenger Satisfaction')
 ax2.set_xlabel('Departure Delay (Minutes)')
 ax2.set_ylabel('Passenger Satisfaction Score')
