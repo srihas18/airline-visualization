@@ -4,3 +4,5 @@ seaborn
 pandas
 streamlit-option-menu
 plotly
+scipy.stats
+gaussian_kde
