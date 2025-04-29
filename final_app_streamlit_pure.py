@@ -3,6 +3,9 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+
 
 st.set_page_config(page_title="Passenger Satisfaction Analysis", layout="wide")
 
@@ -29,7 +32,6 @@ st.pyplot(fig1)
 
 # Additional visualizations can be added similarly following the Colab notebook
 # --- Visualization 2: Departure Delay vs Satisfaction (Enhanced Plotly Version) ---
-import plotly.express as px
 
 st.subheader("Visualization 2: Departure Delay vs Satisfaction")
 fig2, ax2 = plt.subplots(figsize=(12, 7))
@@ -115,7 +117,6 @@ fig4.add_scatter(
 st.plotly_chart(fig4)
 
 # --- Visualization 5: Interactive Correlation Heatmap of Service Features ---
-import plotly.graph_objects as go
 
 st.subheader("Visualization 5: Interactive Correlation Heatmap of Service Features")
 
