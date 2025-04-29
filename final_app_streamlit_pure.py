@@ -1,12 +1,3 @@
-import os
-
-st.write("Files available:", os.listdir())
-
-try:
-    df = pd.read_csv('your_dataset.csv')
-    st.success("CSV loaded successfully!")
-except Exception as e:
-    st.error(f"Failed to load CSV: {e}")
 
 import streamlit as st
 import pandas as pd
@@ -15,8 +6,6 @@ import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 
-
-st.set_page_config(page_title="Passenger Satisfaction Analysis", layout="wide")
 
 # Load dataset
 df = pd.read_csv('your_dataset.csv')
