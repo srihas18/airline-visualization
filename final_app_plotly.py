@@ -22,7 +22,7 @@ st.plotly_chart(fig1)
 
 # Visualization 2: Departure Delay vs Satisfaction
 st.subheader("Visualization 2: Departure Delay vs Satisfaction")
-fig2 = px.scatter(df, x='Departure Delay in Minutes', y='Satisfaction', color='Class', opacity=0.7)
+fig2 = px.scatter(df, x='Departure Delay', y='Satisfaction', color='Class', opacity=0.7)
 fig2.update_layout(title="Impact of Departure Delay on Passenger Satisfaction")
 st.plotly_chart(fig2)
 
