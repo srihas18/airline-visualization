@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,12 +5,13 @@ import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 
+st.set_page_config(page_title="Passenger Satisfaction Analysis", layout="wide")
 
 # Load dataset
 df = pd.read_csv('your_dataset.csv')
 df.columns = df.columns.str.strip()
 
-# Visualization 1: Passenger Satisfaction by Class
+# --- Visualization 1: Passenger Satisfaction by Class (Histogram + KDE) ---
 st.subheader("Visualization 1: Passenger Satisfaction by Travel Class")
 fig1, ax1 = plt.subplots(figsize=(10,6))
 sns.histplot(
@@ -29,14 +29,12 @@ ax1.set_ylabel('Count')
 st.pyplot(fig1)
 plt.close(fig1)
 
-# Additional visualizations can be added similarly following the Colab notebook
-# --- Visualization 2: Departure Delay vs Satisfaction (Enhanced Plotly Version) ---
-scatter_df = df.dropna(subset=['Departure Delay', 'Satisfaction', 'Class'])  # <-- clean
-
+# --- Visualization 2: Departure Delay vs Satisfaction (Seaborn Scatterplot) ---
 st.subheader("Visualization 2: Departure Delay vs Satisfaction")
+scatter_df = df.dropna(subset=['Departure Delay', 'Satisfaction', 'Class'])
 fig2, ax2 = plt.subplots(figsize=(12, 7))
 sns.scatterplot(
-    data=df,
+    data=scatter_df,
     x='Departure Delay',
     y='Satisfaction',
     hue='Class',
@@ -54,8 +52,10 @@ ax2.grid(True, linestyle='--', alpha=0.5)
 st.pyplot(fig2)
 plt.close(fig2)
 
+# --- Important: Clear Seaborn vs Plotly context ---
+st.markdown('---')
 
-# --- Visualization 3: Arrival Delay Impact (Violin, Interactive Plotly Version) ---
+# --- Visualization 3: Arrival Delay Impact (Plotly Violin) ---
 st.subheader("Visualization 3: Arrival Delay Impact on Satisfaction")
 
 fig3 = px.violin(
@@ -71,7 +71,6 @@ fig3 = px.violin(
         "neutral or dissatisfied": "red"
     }
 )
-
 fig3.update_layout(
     title="Impact of Arrival Delays on Passenger Satisfaction",
     yaxis_title="Arrival Delay (Minutes)",
@@ -82,13 +81,10 @@ fig3.update_layout(
     xaxis=dict(title_font=dict(size=16)),
     yaxis=dict(title_font=dict(size=16))
 )
-
 fig3.update_traces(meanline_visible=True)
 st.plotly_chart(fig3)
-plt.close(fig3)
 
-
-# --- Visualization 4: High Delay but Still Satisfied (Anomaly Highlight) ---
+# --- Visualization 4: High Delay but Still Satisfied (Anomalies) ---
 st.subheader("Visualization 4: High Delay but Still Satisfied (Anomalies)")
 
 df['Departure Delay'] = df['Departure Delay'].fillna(0)
@@ -109,7 +105,6 @@ fig4 = px.scatter(
     title='High Delay but Still Satisfied (Anomalies)',
     size_max=22
 )
-
 fig4.add_scatter(
     x=anomalies['Total_Delay'],
     y=anomalies['Flight Distance'],
@@ -117,13 +112,9 @@ fig4.add_scatter(
     marker=dict(size=14, color='gold', symbol='star'),
     name='Happy Despite Delay'
 )
-
 st.plotly_chart(fig4)
-plt.close(fig4)
-
 
 # --- Visualization 5: Interactive Correlation Heatmap of Service Features ---
-
 st.subheader("Visualization 5: Interactive Correlation Heatmap of Service Features")
 
 service_features = df.select_dtypes(include=['number']).columns.tolist()
@@ -140,7 +131,6 @@ fig5 = go.Figure(data=go.Heatmap(
     hoverongaps=False,
     hovertemplate='Service 1: %{y}<br>Service 2: %{x}<br>Correlation: %{z:.2f}<extra></extra>'
 ))
-
 fig5.update_layout(
     title='Interactive Correlation between Service Features',
     xaxis_title="Service Features",
@@ -151,8 +141,7 @@ fig5.update_layout(
     xaxis_showgrid=False,
     yaxis_showgrid=False
 )
-
 st.plotly_chart(fig5)
-plt.close(fig5)
 
-
+st.markdown("---")
+st.caption("Created with ❤️ by Aashi, Srihas, and Neeraj. Powered by Streamlit 🚀")
