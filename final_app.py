@@ -75,9 +75,6 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # -----------------------------------
 # Visualization 2: Departure Delay vs Satisfaction
-st.write("Current df columns:", df.columns.tolist())
-st.write(df.head())
-
 st.markdown('<div class="chart-section">', unsafe_allow_html=True)
 st.subheader("Visualization 2: Departure Delay vs Satisfaction")
 
