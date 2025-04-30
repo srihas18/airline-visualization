@@ -10,6 +10,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
+# Set Seaborn/Matplotlib to white background to match Colab
+sns.set_theme(style="whitegrid")
+plt.rcParams['axes.facecolor'] = 'white'
+plt.rcParams['figure.facecolor'] = 'white'
+
+# Remove custom CSS that forces chart backgrounds
+# (Comment out or remove the MAKE PLOT BACKGROUNDS WHITE block in local_css)
 def local_css():
     st.markdown(
         """
@@ -22,65 +29,84 @@ def local_css():
             font-family: 'Segoe UI', sans-serif;
             color: white;
         }
-
         /* -------- MAIN CONTAINER CARD -------- */
         .block-container {
             background-color: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
-            padding: 2rem 3rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
             color: #f1f1f1;
+            width: 100vw !important;
+            min-height: 100vh !important;
+            max-width: 100vw !important;
         }
-
         /* -------- HEADINGS -------- */
         h1, h2, h3, h4 {
             color: #ffffff;
             font-family: 'Segoe UI Semibold', sans-serif;
             letter-spacing: 0.5px;
         }
-
         /* -------- TABS -------- */
         [data-baseweb="tab"] {
             font-size: 16px;
             font-weight: 500;
             color: #e6f0ff;
         }
-
         [data-baseweb="tab"]:hover {
             color: #66ccff;
         }
-
         [data-baseweb="tab"] > div[data-testid="stMarkdownContainer"] > p {
             font-weight: bold;
             color: #66ccff;
         }
-
         /* -------- CHART BACKGROUND -------- */
         .element-container:has(.js-plotly-plot) {
-            border-radius: 10px;
-            padding: 1rem;
+            border-radius: 0;
+            padding: 0;
             background-color: rgba(255, 255, 255, 0.03);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            box-shadow: none;
         }
-
         .js-plotly-plot svg {
-            border-radius: 10px;
+            border-radius: 0;
         }
-
         /* -------- FOOTER/HDR -------- */
         footer, header {
             visibility: hidden;
         }
-
         /* -------- TAB ANIMATION -------- */
         .css-1cpxqw2, .stTabs {
             animation: fadeIn 0.5s ease-in-out;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        /* -------- MAKE PLOT BACKGROUNDS WHITE -------- */
+        /* .element-container:has(.js-plotly-plot), .element-container:has(canvas) {
+            background-color: white !important;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .js-plotly-plot .plotly {
+            background-color: white !important;
+        } */
+        /* Center the tab bar */
+        .stTabs [role="tablist"] {
+            display: flex;
+            justify-content: center;
+        }
+        /* Slightly center subheaders/titles under each tab */
+        .block-container h2 {
+            margin-left: 3vw;
+        }
+        /* Center the main title and subtitle */
+        .block-container h1, .block-container h4 {
+            text-align: center;
+        }
+        .block-container h4 {
+            margin-left: 1vw;
         }
         </style>
         """,
@@ -107,19 +133,18 @@ tabs = st.tabs(["Histogram", "Scatter plot", "Violin plot", "Bubble scatter plot
 # --- Tab 1: Histogram ---
 with tabs[0]:
     st.subheader("Visualization 1: Satisfaction by Travel Class")
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(8, 5))
     sns.histplot(data=df, x='Satisfaction', hue='Class', multiple='dodge', palette='Set2', kde=True, ax=ax)
     ax.set_title('Passenger Satisfaction by Class')
     ax.set_xlabel('Satisfaction')
     ax.set_ylabel('Count')
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=True)
     st.caption("Business class passengers show higher satisfaction, while Economy class sees more dissatisfaction.")
 
 # --- Tab 2: Delays vs Satisfaction ---
 with tabs[1]:
     st.subheader("Visualization 2: Departure Delay vs Satisfaction")
-
-    fig_delay, ax_delay = plt.subplots(figsize=(12, 7))
+    fig_delay, ax_delay = plt.subplots(figsize=(10, 6))
     sns.scatterplot(
         x='Departure Delay',
         y='Satisfaction',
@@ -136,22 +161,17 @@ with tabs[1]:
     ax_delay.set_ylabel('Satisfaction Score', fontsize=14)
     ax_delay.legend(title='Travel Class')
     ax_delay.grid(True, linestyle='-', alpha=0.5)
-
-    st.pyplot(fig_delay)
+    st.pyplot(fig_delay, use_container_width=True)
     st.caption("Even short delays can reduce satisfaction, but major dissatisfaction occurs when delays exceed 100 minutes.")
 
 # --- Tab 3: Arrival Delay vs Satisfaction ---
-with tabs[2]:  # or the index for your Violin plot tab
+with tabs[2]:
     st.subheader("Visualization 3: Arrival Delay Impact on Satisfaction")
-
-    # Normalize and create satisfaction label
     df['Satisfaction'] = df['Satisfaction'].str.strip().str.lower()
     df['Satisfaction_Label'] = df['Satisfaction'].map({
         'satisfied': 'Satisfied',
         'neutral or dissatisfied': 'Neutral or Dissatisfied'
     })
-
-    # Check if label was created correctly
     if 'Satisfaction_Label' in df.columns:
         fig_violin = px.violin(
             df,
@@ -164,9 +184,9 @@ with tabs[2]:  # or the index for your Violin plot tab
             color_discrete_map={
                 "Satisfied": "#B388EB",
                 "Neutral or Dissatisfied": "#61C0BF"
-            }
+            },
+            template='plotly_white'
         )
-
         fig_violin.update_layout(
             title="Impact of Arrival Delays on Passenger Satisfaction",
             yaxis_title="Arrival Delay (Minutes)",
@@ -174,31 +194,26 @@ with tabs[2]:  # or the index for your Violin plot tab
             transition=dict(duration=500, easing="cubic-in-out"),
             width=850,
             height=600,
-            plot_bgcolor='rgba(255,255,255,0.05)',
-            paper_bgcolor='rgba(255,255,255,0.02)',
-            font=dict(color="white")
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            font=dict(color="black"),
+            xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), showgrid=True, linecolor='black', zerolinecolor='black'),
+            yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), showgrid=True, linecolor='black', zerolinecolor='black'),
+            legend=dict(font=dict(color='black'))
         )
-
         fig_violin.update_traces(meanline_visible=True)
         st.plotly_chart(fig_violin, use_container_width=True)
     else:
         st.warning("Satisfaction_Label column not found.")
 
-
 # --- Tab 4: Satisfied Despite High Delays (Anomalies) ---
 with tabs[3]:
     st.subheader("Visualization 4: High Delay but Still Satisfied (Anomalies)")
-
-    # Ensure delays are handled
     df['Departure Delay'] = df['Departure Delay'].fillna(0)
     df['Arrival Delay'] = df['Arrival Delay'].fillna(0)
     df['Total_Delay'] = df['Departure Delay'] + df['Arrival Delay']
-
-    # Detect anomalies
     threshold_delay = df['Total_Delay'].quantile(0.90)
     anomalies = df[(df['Total_Delay'] > threshold_delay) & (df['Satisfaction'].str.lower() == 'satisfied')]
-
-    # Main scatter
     fig_anomaly = px.scatter(
         df,
         x='Total_Delay',
@@ -218,8 +233,6 @@ with tabs[3]:
             "Flight Distance": "Flight Distance"
         }
     )
-
-    # Add anomaly stars
     fig_anomaly.add_trace(go.Scatter(
         x=anomalies['Total_Delay'],
         y=anomalies['Flight Distance'],
@@ -230,38 +243,32 @@ with tabs[3]:
             size=16,
             color='gold',
             opacity=0.9,
-            line=dict(width=0)  # No outline
+            line=dict(width=0)
         ),
         hovertext='Anomaly: Satisfied with high delay',
         showlegend=True
     ))
-
     fig_anomaly.update_layout(
         legend_title="Satisfaction",
         width=950,
         height=650,
         font=dict(family='Arial', size=14, color='black'),
-        xaxis=dict(showgrid=True, gridcolor='lightgray'),
-        yaxis=dict(showgrid=True, gridcolor='lightgray'),
-        plot_bgcolor='white'
+        xaxis=dict(showgrid=True, gridcolor='lightgray', title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+        yaxis=dict(showgrid=True, gridcolor='lightgray', title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        legend=dict(font=dict(color='black'))
     )
-
     st.plotly_chart(fig_anomaly, use_container_width=True)
     st.caption("This violin plot shows how arrival delays skew dissatisfaction. Longer delays especially frustrate neutral/dissatisfied travelers.")
 
-
 # --- Tab 5: Service Feature Correlation (Heatmap) ---
-with tabs[4]:  # Use the correct index for your heatmap tab
+with tabs[4]:
     st.subheader("Visualization 5: Correlation Between Service Features")
-
-    # Prepare numeric columns, exclude Total_Delay
     numerical_cols = df.select_dtypes(include='number').columns.tolist()
     if "Total_Delay" in numerical_cols:
         numerical_cols.remove("Total_Delay")
-
     corr_matrix = df[numerical_cols].corr().round(2)
-
-    # Create Plotly heatmap
     fig_heatmap = go.Figure(data=go.Heatmap(
         z=corr_matrix.values,
         x=corr_matrix.columns,
@@ -269,11 +276,9 @@ with tabs[4]:  # Use the correct index for your heatmap tab
         zmin=-1,
         zmax=1,
         colorscale='RdBu',
-        colorbar=dict(title='Correlation'),
+        colorbar=dict(title='Correlation', x=0.92, tickfont=dict(color='black'), titlefont=dict(color='black')),
         hovertemplate='Feature 1: %{y}<br>Feature 2: %{x}<br>Correlation: %{z:.2f}<extra></extra>'
     ))
-
-    # Update layout for clean, centered appearance
     fig_heatmap.update_layout(
         title='Interactive Correlation between Service Features',
         xaxis_title="Service Features",
@@ -287,52 +292,48 @@ with tabs[4]:  # Use the correct index for your heatmap tab
             showline=False,
             ticks='',
             tickfont=dict(size=11, color='black'),
-            scaleanchor='y'
+            scaleanchor='y',
+            title_font=dict(color='black'),
+            linecolor='black',
+            zerolinecolor='black'
         ),
         yaxis=dict(
             showgrid=False,
             zeroline=False,
             showline=False,
             ticks='',
-            tickfont=dict(size=11, color='black')
+            tickfont=dict(size=11, color='black'),
+            title_font=dict(color='black'),
+            linecolor='black',
+            zerolinecolor='black'
         ),
         font=dict(family='Segoe UI', color='black'),
-        margin=dict(t=50, l=80, r=50, b=80),
+        margin=dict(l=120, r=40, t=50, b=80),
         plot_bgcolor='white',
         paper_bgcolor='white',
-        transition=dict(duration=500, easing='cubic-in-out')
+        transition=dict(duration=500, easing='cubic-in-out'),
+        legend=dict(font=dict(color='black')),
+        title_font=dict(color='black')
     )
-
-    st.plotly_chart(fig_heatmap, use_container_width=False)
+    st.plotly_chart(fig_heatmap, use_container_width=True)
     st.caption("This clean heatmap shows correlations among numeric features without grid distractions.")
-
 
 # --- Tab 6: Travel Type to Satisfaction (Sankey Diagram) ---
 with tabs[5]:
     st.subheader("Visualization 6: Passenger Travel Type ➔ Satisfaction Flow")
-
-    # Prepare Sankey data
     sankey_data = df.groupby(['Type of Travel', 'Satisfaction']).size().reset_index(name='count')
-
-    # Build labels list and mapping
     labels = sankey_data['Type of Travel'].unique().tolist() + sankey_data['Satisfaction'].unique().tolist()
     label_map = {label: idx for idx, label in enumerate(labels)}
-
     source = sankey_data['Type of Travel'].map(label_map)
     target = sankey_data['Satisfaction'].map(label_map)
     value = sankey_data['count']
-
-    # Colors
     pastel_colors = ['#4ABDAC', '#F7B733', '#3B3B98', '#FC4A1A', '#ffb6b9', '#a2d5f2', '#ffe156', '#a0e426', '#f85f73', '#ff9a00']
     node_colors = pastel_colors * (len(labels) // len(pastel_colors) + 1)
     node_colors = node_colors[:len(labels)]
-
     link_colors = [
         'rgba(173, 216, 230, 0.6)' if sat.strip().lower() == 'satisfied' else 'rgba(255, 213, 128, 0.6)'
         for sat in sankey_data['Satisfaction']
     ]
-
-    # Build Sankey diagram
     fig_sankey = go.Figure(data=[go.Sankey(
         arrangement="snap",
         node=dict(
@@ -340,7 +341,8 @@ with tabs[5]:
             thickness=30,
             line=dict(color="black", width=0.5),
             label=labels,
-            color=node_colors
+            color=node_colors,
+            font=dict(color='black', size=18)
         ),
         link=dict(
             source=source,
@@ -349,47 +351,38 @@ with tabs[5]:
             color=link_colors
         )
     )])
-
     fig_sankey.update_layout(
         title_text="Passenger Travel Type ➔ Satisfaction Flow",
         font=dict(size=14, family='Arial', color='black'),
         margin=dict(l=30, r=30, t=50, b=30),
         width=900,
         height=600,
-        plot_bgcolor='white'
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        legend=dict(font=dict(color='black')),
+        xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+        title_font=dict(color='black')
     )
-
     st.plotly_chart(fig_sankey, use_container_width=True)
     st.caption("This Sankey diagram shows how different travel types (e.g., Business vs. Personal) influence satisfaction levels. The thicker the flow, the greater the number of passengers in that path.")
-
 
 # --- Tab 7: Passenger Segments (PCA + KMeans Clustering) ---
 with tabs[6]:
     st.subheader("Visualization 9: Passenger Segments - Who They Are")
-
-    # Step 1: Define feature list
     service_features = [
         'In-flight Entertainment', 'Seat Comfort', 'Cleanliness',
         'Food and Drink', 'In-flight Wifi Service', 'Leg Room Service'
     ]
-
     features = service_features + ['Flight Distance', 'Departure Delay', 'Arrival Delay', 'Age']
     X = df[features].dropna()
-
-    # Step 2: Standardize features
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
-
-    # Step 3: PCA dimensionality reduction
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X_scaled)
-
-    # Step 4: KMeans clustering
     kmeans = KMeans(n_clusters=4, random_state=42, n_init='auto')
     clusters = kmeans.fit_predict(X_scaled)
     df['Cluster'] = clusters
-
-    # Step 5: Prepare Plotly dataframe
     df_pca = pd.DataFrame({
         'PCA1': X_pca[:, 0],
         'PCA2': X_pca[:, 1],
@@ -399,8 +392,6 @@ with tabs[6]:
         'Age': df.loc[X.index, 'Age'],
         'Flight Distance': df.loc[X.index, 'Flight Distance']
     })
-
-    # Step 6: Scatter plot
     fig_pca = px.scatter(
         df_pca,
         x='PCA1',
@@ -418,41 +409,33 @@ with tabs[6]:
         title="Passenger Segments: Who They Are (KMeans + PCA)",
         labels={'PCA1': 'PCA Component 1', 'PCA2': 'PCA Component 2'},
         width=900,
-        height=700
+        height=700,
+        template='plotly_white'
     )
-
     fig_pca.update_traces(marker=dict(size=10, line=dict(width=1, color='black')))
     fig_pca.update_layout(
         legend_title="Passenger Segment",
         plot_bgcolor='white',
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=False),
+        xaxis=dict(showgrid=False, title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+        yaxis=dict(showgrid=False, title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+        font=dict(color='black'),
+        legend=dict(font=dict(color='black'))
     )
-
     st.plotly_chart(fig_pca, use_container_width=True)
     st.caption("This plot segments passengers based on service preferences and travel behavior. Clusters are created using KMeans, and reduced to 2D with PCA.")
-
 
 # --- Tab 8: Cluster Profiles by Service Preferences (Radar Chart) ---
 with tabs[7]:
     st.subheader("Visualization 10: Service Profile by Passenger Segment (Radar Chart)")
-
-    # Ensure clusters exist from previous tab (PCA + KMeans)
     if 'Cluster' not in df.columns:
         st.warning("Please generate clusters in the previous tab before viewing this chart.")
     else:
-        # Define service features used in clustering
         service_features = [
             'In-flight Entertainment', 'Seat Comfort', 'Cleanliness',
             'Food and Drink', 'In-flight Wifi Service', 'Leg Room Service'
         ]
-
-        # Calculate cluster-wise means
         cluster_service_means = df.groupby('Cluster')[service_features].mean().reset_index()
-
-        # Create radar chart
         fig_radar_cluster = go.Figure()
-
         for cluster in cluster_service_means['Cluster']:
             fig_radar_cluster.add_trace(go.Scatterpolar(
                 r=cluster_service_means[cluster_service_means['Cluster'] == cluster][service_features].values.flatten(),
@@ -460,15 +443,18 @@ with tabs[7]:
                 fill='toself',
                 name=f'Cluster {cluster}'
             ))
-
         fig_radar_cluster.update_layout(
             polar=dict(
                 radialaxis=dict(visible=True)
             ),
             title="Service Profile by Passenger Segment (Radar Chart)",
             width=800,
-            height=600
+            height=600,
+            font=dict(color='black'),
+            template='plotly_white',
+            legend=dict(font=dict(color='black')),
+            xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+            yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black')
         )
-
         st.plotly_chart(fig_radar_cluster, use_container_width=True)
         st.caption("Each radar outline represents a cluster's average rating for key service dimensions. Clear patterns show how segments differ in what they value.")
