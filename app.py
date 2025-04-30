@@ -99,14 +99,11 @@ def local_css():
         }
         /* Slightly center subheaders/titles under each tab */
         .block-container h2 {
-            margin-left: 3vw;
+            margin-left: 2vw;
         }
         /* Center the main title and subtitle */
         .block-container h1, .block-container h4 {
             text-align: center;
-        }
-        .block-container h4 {
-            margin-left: 1vw;
         }
         </style>
         """,
@@ -133,7 +130,7 @@ tabs = st.tabs(["Histogram", "Scatter plot", "Violin plot", "Bubble scatter plot
 # --- Tab 1: Histogram ---
 with tabs[0]:
     st.subheader("Visualization 1: Satisfaction by Travel Class")
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
     sns.histplot(data=df, x='Satisfaction', hue='Class', multiple='dodge', palette='Set2', kde=True, ax=ax)
     ax.set_title('Passenger Satisfaction by Class')
     ax.set_xlabel('Satisfaction')
@@ -144,7 +141,7 @@ with tabs[0]:
 # --- Tab 2: Delays vs Satisfaction ---
 with tabs[1]:
     st.subheader("Visualization 2: Departure Delay vs Satisfaction")
-    fig_delay, ax_delay = plt.subplots(figsize=(10, 6))
+    fig_delay, ax_delay = plt.subplots(figsize=(12, 7))
     sns.scatterplot(
         x='Departure Delay',
         y='Satisfaction',
@@ -276,7 +273,7 @@ with tabs[4]:
         zmin=-1,
         zmax=1,
         colorscale='RdBu',
-        colorbar=dict(title='Correlation', x=0.92, tickfont=dict(color='black'), titlefont=dict(color='black')),
+        colorbar=dict(title='Correlation'),
         hovertemplate='Feature 1: %{y}<br>Feature 2: %{x}<br>Correlation: %{z:.2f}<extra></extra>'
     ))
     fig_heatmap.update_layout(
@@ -308,12 +305,11 @@ with tabs[4]:
             zerolinecolor='black'
         ),
         font=dict(family='Segoe UI', color='black'),
-        margin=dict(l=120, r=40, t=50, b=80),
+        margin=dict(t=50, l=80, r=50, b=80),
         plot_bgcolor='white',
         paper_bgcolor='white',
         transition=dict(duration=500, easing='cubic-in-out'),
-        legend=dict(font=dict(color='black')),
-        title_font=dict(color='black')
+        legend=dict(font=dict(color='black'))
     )
     st.plotly_chart(fig_heatmap, use_container_width=True)
     st.caption("This clean heatmap shows correlations among numeric features without grid distractions.")
@@ -341,8 +337,7 @@ with tabs[5]:
             thickness=30,
             line=dict(color="black", width=0.5),
             label=labels,
-            color=node_colors,
-            font=dict(color='black', size=18)
+            color=node_colors
         ),
         link=dict(
             source=source,
@@ -361,8 +356,7 @@ with tabs[5]:
         paper_bgcolor='white',
         legend=dict(font=dict(color='black')),
         xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
-        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
-        title_font=dict(color='black')
+        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black')
     )
     st.plotly_chart(fig_sankey, use_container_width=True)
     st.caption("This Sankey diagram shows how different travel types (e.g., Business vs. Personal) influence satisfaction levels. The thicker the flow, the greater the number of passengers in that path.")
