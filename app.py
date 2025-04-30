@@ -10,8 +10,87 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
+def local_css():
+    st.markdown(
+        """
+        <style>
+        /* -------- BACKGROUND -------- */
+        .stApp {
+            background: linear-gradient(to bottom, #001f3f, #003366, #004080);
+            background-attachment: fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+        }
+
+        /* -------- MAIN CONTAINER CARD -------- */
+        .block-container {
+            background-color: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            padding: 2rem 3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            color: #f1f1f1;
+        }
+
+        /* -------- HEADINGS -------- */
+        h1, h2, h3, h4 {
+            color: #ffffff;
+            font-family: 'Segoe UI Semibold', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* -------- TABS -------- */
+        [data-baseweb="tab"] {
+            font-size: 16px;
+            font-weight: 500;
+            color: #e6f0ff;
+        }
+
+        [data-baseweb="tab"]:hover {
+            color: #66ccff;
+        }
+
+        [data-baseweb="tab"] > div[data-testid="stMarkdownContainer"] > p {
+            font-weight: bold;
+            color: #66ccff;
+        }
+
+        /* -------- CHART BACKGROUND -------- */
+        .element-container:has(.js-plotly-plot) {
+            border-radius: 10px;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.03);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .js-plotly-plot svg {
+            border-radius: 10px;
+        }
+
+        /* -------- FOOTER/HDR -------- */
+        footer, header {
+            visibility: hidden;
+        }
+
+        /* -------- TAB ANIMATION -------- */
+        .css-1cpxqw2, .stTabs {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 # Page config
 st.set_page_config(page_title="Decoding Passenger Satisfaction", layout="wide")
+local_css()
 
 # Load data
 df = pd.read_csv('your_dataset.csv')
@@ -23,9 +102,9 @@ st.markdown("#### Analyze What Drives Passenger Experience in Air Travel")
 st.markdown("---")
 
 # Tabs
-tabs = st.tabs(["Histogram", "Scatter plot", "Violin plot", "Bubble scatter plot", "heatmap", "Sankey diagram", "Radar chart", "sunburst", "scatter plot after clustering and dimensionality reduction", "Radar chart2", "heatmap"])
+tabs = st.tabs(["Histogram", "Scatter plot", "Violin plot", "Bubble scatter plot", "heatmap", "Sankey diagram", "scatter plot after clustering and dimensionality reduction", "Radar chart"])
 
-# --- Tab 1: Overview ---
+# --- Tab 1: Histogram ---
 with tabs[0]:
     st.subheader("Visualization 1: Satisfaction by Travel Class")
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -62,6 +141,51 @@ with tabs[1]:
     st.caption("Even short delays can reduce satisfaction, but major dissatisfaction occurs when delays exceed 100 minutes.")
 
 # --- Tab 3: Arrival Delay vs Satisfaction ---
+with tabs[2]:  # or the index for your Violin plot tab
+    st.subheader("Visualization 3: Arrival Delay Impact on Satisfaction")
+
+    # Normalize and create satisfaction label
+    df['Satisfaction'] = df['Satisfaction'].str.strip().str.lower()
+    df['Satisfaction_Label'] = df['Satisfaction'].map({
+        'satisfied': 'Satisfied',
+        'neutral or dissatisfied': 'Neutral or Dissatisfied'
+    })
+
+    # Check if label was created correctly
+    if 'Satisfaction_Label' in df.columns:
+        fig_violin = px.violin(
+            df,
+            y="Arrival Delay",
+            x="Satisfaction_Label",
+            box=True,
+            points="all",
+            color="Satisfaction_Label",
+            hover_data=["Flight Distance", "Type of Travel", "Class", "Age"],
+            color_discrete_map={
+                "Satisfied": "#B388EB",
+                "Neutral or Dissatisfied": "#61C0BF"
+            }
+        )
+
+        fig_violin.update_layout(
+            title="Impact of Arrival Delays on Passenger Satisfaction",
+            yaxis_title="Arrival Delay (Minutes)",
+            xaxis_title="Passenger Satisfaction Level",
+            transition=dict(duration=500, easing="cubic-in-out"),
+            width=850,
+            height=600,
+            plot_bgcolor='rgba(255,255,255,0.05)',
+            paper_bgcolor='rgba(255,255,255,0.02)',
+            font=dict(color="white")
+        )
+
+        fig_violin.update_traces(meanline_visible=True)
+        st.plotly_chart(fig_violin, use_container_width=True)
+    else:
+        st.warning("Satisfaction_Label column not found.")
+
+
+# --- Tab 4: Satisfied Despite High Delays (Anomalies) ---
 with tabs[3]:
     st.subheader("Visualization 4: High Delay but Still Satisfied (Anomalies)")
 
@@ -126,58 +250,18 @@ with tabs[3]:
     st.caption("This violin plot shows how arrival delays skew dissatisfaction. Longer delays especially frustrate neutral/dissatisfied travelers.")
 
 
-# --- Tab 4: Satisfied Despite High Delays (Anomalies) ---
-with tabs[3]:
-    st.subheader("Visualization 4: High Delay but Still Satisfied (Anomalies)")
-
-    # Create 'Total_Delay' column
-    df['Departure Delay'] = df['Departure Delay'].fillna(0)
-    df['Arrival Delay'] = df['Arrival Delay'].fillna(0)
-    df['Total_Delay'] = df['Departure Delay'] + df['Arrival Delay']
-
-    # Calculate 90th percentile delay threshold
-    threshold_delay = df['Total_Delay'].quantile(0.90)
-
-    # Identify anomalies: satisfied despite long delay
-    anomalies = df[(df['Total_Delay'] > threshold_delay) & (df['Satisfaction'].str.strip().str.lower() == 'satisfied')]
-
-    # Base scatter plot
-    fig_anomaly = px.scatter(
-        df,
-        x='Total_Delay',
-        y='Flight Distance',
-        size='Age',
-        color='Satisfaction',
-        hover_name='Class',
-        opacity=0.3,
-        title='High Delay but Still Satisfied (Anomalies)',
-        size_max=22
-    )
-
-    # Add anomaly markers
-    fig_anomaly.add_scatter(
-        x=anomalies['Total_Delay'],
-        y=anomalies['Flight Distance'],
-        mode='markers',
-        marker=dict(size=14, color='gold', symbol='star'),
-        name='Happy Despite Delay'
-    )
-
-    st.plotly_chart(fig_anomaly, use_container_width=True)
-    st.caption("This highlights rare cases where passengers remained satisfied despite facing extreme delays — possible loyalty, comfort, or other factors at play.")
-
-
 # --- Tab 5: Service Feature Correlation (Heatmap) ---
-with tabs[4]:
+with tabs[4]:  # Use the correct index for your heatmap tab
     st.subheader("Visualization 5: Correlation Between Service Features")
 
-    # Full list of numerical service columns
+    # Prepare numeric columns, exclude Total_Delay
     numerical_cols = df.select_dtypes(include='number').columns.tolist()
+    if "Total_Delay" in numerical_cols:
+        numerical_cols.remove("Total_Delay")
 
-    # Compute correlation matrix
     corr_matrix = df[numerical_cols].corr().round(2)
 
-    # Create heatmap
+    # Create Plotly heatmap
     fig_heatmap = go.Figure(data=go.Heatmap(
         z=corr_matrix.values,
         x=corr_matrix.columns,
@@ -189,23 +273,38 @@ with tabs[4]:
         hovertemplate='Feature 1: %{y}<br>Feature 2: %{x}<br>Correlation: %{z:.2f}<extra></extra>'
     ))
 
-    # Update layout
+    # Update layout for clean, centered appearance
     fig_heatmap.update_layout(
         title='Interactive Correlation between Service Features',
         xaxis_title="Service Features",
         yaxis_title="Service Features",
-        xaxis=dict(tickangle=45),
-        autosize=True,
-        width=900,
-        height=900,
-        font=dict(family='Arial', size=12),
-        margin=dict(t=60, l=60, r=60, b=60),
+        width=850,
+        height=850,
+        xaxis=dict(
+            tickangle=90,
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            ticks='',
+            tickfont=dict(size=11, color='black'),
+            scaleanchor='y'
+        ),
+        yaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            ticks='',
+            tickfont=dict(size=11, color='black')
+        ),
+        font=dict(family='Segoe UI', color='black'),
+        margin=dict(t=50, l=80, r=50, b=80),
         plot_bgcolor='white',
-        paper_bgcolor='white'
+        paper_bgcolor='white',
+        transition=dict(duration=500, easing='cubic-in-out')
     )
 
-    st.plotly_chart(fig_heatmap, use_container_width=True)
-    st.caption("This heatmap shows pairwise correlations among service and numerical features. The color intensity reflects the strength and direction of the relationships.")
+    st.plotly_chart(fig_heatmap, use_container_width=False)
+    st.caption("This clean heatmap shows correlations among numeric features without grid distractions.")
 
 
 # --- Tab 6: Travel Type to Satisfaction (Sankey Diagram) ---
@@ -263,108 +362,9 @@ with tabs[5]:
     st.plotly_chart(fig_sankey, use_container_width=True)
     st.caption("This Sankey diagram shows how different travel types (e.g., Business vs. Personal) influence satisfaction levels. The thicker the flow, the greater the number of passengers in that path.")
 
-# --- Tab 7: Top 3 Satisfaction Drivers (Radar Chart) ---
+
+# --- Tab 7: Passenger Segments (PCA + KMeans Clustering) ---
 with tabs[6]:
-    st.subheader("Visualization 7: Top 3 Service Factors Driving Passenger Satisfaction")
-
-    # Step 1: Select key service factors
-    service_factors = [
-        'In-flight Wifi Service',
-        'Seat Comfort',
-        'Food and Drink',
-        'In-flight Entertainment',
-        'Online Boarding',
-        'Cleanliness'
-    ]
-
-    # Step 2: Calculate group means
-    satisfied_means = df[df['Satisfaction'].str.strip().str.lower() == 'satisfied'][service_factors].mean()
-    dissatisfied_means = df[df['Satisfaction'].str.strip().str.lower() == 'neutral or dissatisfied'][service_factors].mean()
-
-    # Step 3: Calculate difference and get top 3
-    diff_means = satisfied_means - dissatisfied_means
-    top3_services = diff_means.sort_values(ascending=False).head(3).index.tolist()
-
-    # Step 4: Radar chart
-    fig_radar = go.Figure()
-
-    fig_radar.add_trace(go.Scatterpolar(
-        r=diff_means[top3_services].tolist(),
-        theta=top3_services,
-        fill='toself',
-        name='Top Satisfaction Drivers',
-        line=dict(color='dodgerblue', width=4),
-        marker=dict(
-            size=10,
-            color='navy',
-            symbol='circle-open',
-            line=dict(width=2)
-        ),
-        hoverinfo='text',
-        text=[f"{factor}: {round(diff_means[factor], 2)} pts" for factor in top3_services],
-        opacity=0.85
-    ))
-
-    fig_radar.update_layout(
-        title="Top 3 Service Factors Driving Passenger Satisfaction",
-        title_font_size=24,
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 1],
-                gridcolor='lightgrey',
-                tickfont=dict(size=13),
-                linecolor='grey'
-            ),
-            bgcolor='white'
-        ),
-        showlegend=True,
-        width=850,
-        height=700,
-        plot_bgcolor='white',
-        legend=dict(
-            font=dict(size=13),
-            yanchor="top",
-            y=1.0,
-            xanchor="left",
-            x=0.8,
-            bgcolor='rgba(255,255,255,0.5)',
-            bordercolor='black',
-            borderwidth=1
-        )
-    )
-
-    st.plotly_chart(fig_radar, use_container_width=True)
-    st.caption("This radar chart highlights the three service features that show the biggest satisfaction gap between happy and unhappy passengers.")
-
-# --- Tab 8: Hierarchical Breakdown (Sunburst Chart) ---
-with tabs[7]:
-    st.subheader("Visualization 8: Travel Class ➔ Travel Type ➔ Satisfaction Breakdown")
-
-    fig_sunburst = px.sunburst(
-        df,
-        path=['Class', 'Type of Travel', 'Satisfaction'],
-        values='Flight Distance',
-        color='Satisfaction',
-        color_discrete_map={
-            'neutral or dissatisfied': 'red',
-            'satisfied': 'green'
-        },
-        title="Travel Class ➔ Travel Type ➔ Satisfaction Breakdown"
-    )
-
-    fig_sunburst.update_layout(
-        width=800,
-        height=800,
-        margin=dict(t=40, l=0, r=0, b=0)
-    )
-
-    st.plotly_chart(fig_sunburst, use_container_width=True)
-    st.caption("This interactive sunburst chart shows how passenger class and travel type influence satisfaction levels. The larger the area, the longer the flight distance traveled.")
-
-
-# --- Tab 9: Passenger Segments (PCA + KMeans Clustering) ---
-with tabs[8]:
     st.subheader("Visualization 9: Passenger Segments - Who They Are")
 
     # Step 1: Define feature list
@@ -433,8 +433,8 @@ with tabs[8]:
     st.caption("This plot segments passengers based on service preferences and travel behavior. Clusters are created using KMeans, and reduced to 2D with PCA.")
 
 
-# --- Tab 10: Cluster Profiles by Service Preferences (Radar Chart) ---
-with tabs[9]:
+# --- Tab 8: Cluster Profiles by Service Preferences (Radar Chart) ---
+with tabs[7]:
     st.subheader("Visualization 10: Service Profile by Passenger Segment (Radar Chart)")
 
     # Ensure clusters exist from previous tab (PCA + KMeans)
@@ -472,51 +472,3 @@ with tabs[9]:
 
         st.plotly_chart(fig_radar_cluster, use_container_width=True)
         st.caption("Each radar outline represents a cluster's average rating for key service dimensions. Clear patterns show how segments differ in what they value.")
-
-
-# --- Tab 11: Emotional Landscape of Passenger Segments (Density Plot) ---
-with tabs[10]:
-    st.subheader("Visualization 11: Emotional Landscape of Passenger Segments (Density Based)")
-
-    if 'df_pca' not in locals() or 'PCA1' not in df_pca.columns:
-        st.warning("Please generate PCA + Cluster features in previous tabs to view this chart.")
-    else:
-        x = df_pca['PCA1']
-        y = df_pca['PCA2']
-
-        fig_density = go.Figure()
-
-        fig_density.add_trace(go.Histogram2dContour(
-            x=x,
-            y=y,
-            colorscale='RdYlBu',
-            contours=dict(
-                coloring='heatmap',
-                showlabels=True
-            ),
-            showscale=True,
-            colorbar=dict(title='Density of Passengers'),
-        ))
-
-        fig_density.add_trace(go.Scatter(
-            x=x,
-            y=y,
-            mode='markers',
-            marker=dict(
-                size=5,
-                color='black',
-                opacity=0.4
-            ),
-            hoverinfo='skip'
-        ))
-
-        fig_density.update_layout(
-            title='Emotional Landscape of Passenger Segments (Density Based)',
-            xaxis_title="PCA Component 1",
-            yaxis_title="PCA Component 2",
-            width=800,
-            height=700
-        )
-
-        st.plotly_chart(fig_density, use_container_width=True)
-        st.caption("This heatmap overlays a density contour over the PCA-based latent space, revealing where passenger groups concentrate or diverge emotionally.")
