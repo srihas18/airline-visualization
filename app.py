@@ -270,8 +270,7 @@ with tabs[4]:
         zmax=1,
         colorscale='RdBu',
         colorbar=dict(
-            title='Correlation',
-            titleside='right',
+            title=dict(text='Correlation', side='right'),
             thickness=15,
             len=0.5,
             x=1.02
