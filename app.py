@@ -122,10 +122,9 @@ df.columns = df.columns.str.strip()
 # Title
 st.title("✈️ Decoding Passenger Satisfaction")
 st.markdown("#### Analyze What Drives Passenger Experience in Air Travel")
-st.markdown("---")
 
 # Tabs
-tabs = st.tabs(["Histogram", "Scatter plot", "Violin plot", "Bubble scatter plot", "heatmap", "Sankey diagram", "scatter plot after clustering and dimensionality reduction", "Radar chart"])
+tabs = st.tabs(["Histogram", "Scatter Plot", "Violin plot", "Bubble Scatter Plot", "Heatmap", "Sankey Diagram", "PCA + KMeans", "Radar chart"])
 
 # --- Tab 1: Histogram ---
 with tabs[0]:
@@ -136,7 +135,6 @@ with tabs[0]:
     ax.set_xlabel('Satisfaction')
     ax.set_ylabel('Count')
     st.pyplot(fig, use_container_width=True)
-    st.caption("Business class passengers show higher satisfaction, while Economy class sees more dissatisfaction.")
 
 # --- Tab 2: Delays vs Satisfaction ---
 with tabs[1]:
@@ -159,7 +157,6 @@ with tabs[1]:
     ax_delay.legend(title='Travel Class')
     ax_delay.grid(True, linestyle='-', alpha=0.5)
     st.pyplot(fig_delay, use_container_width=True)
-    st.caption("Even short delays can reduce satisfaction, but major dissatisfaction occurs when delays exceed 100 minutes.")
 
 # --- Tab 3: Arrival Delay vs Satisfaction ---
 with tabs[2]:
@@ -193,10 +190,10 @@ with tabs[2]:
             height=600,
             plot_bgcolor='white',
             paper_bgcolor='white',
-            font=dict(color="black"),
-            xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), showgrid=True, linecolor='black', zerolinecolor='black'),
-            yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), showgrid=True, linecolor='black', zerolinecolor='black'),
-            legend=dict(font=dict(color='black'))
+            font=dict(color="#003366"),
+            xaxis=dict(title_font=dict(color='#003366'), tickfont=dict(color='#003366'), showgrid=True, linecolor='#003366', zerolinecolor='#003366'),
+            yaxis=dict(title_font=dict(color='#003366'), tickfont=dict(color='#003366'), showgrid=True, linecolor='#003366', zerolinecolor='#003366'),
+            legend=dict(font=dict(color='#003366'))
         )
         fig_violin.update_traces(meanline_visible=True)
         st.plotly_chart(fig_violin, use_container_width=True)
@@ -249,15 +246,14 @@ with tabs[3]:
         legend_title="Satisfaction",
         width=950,
         height=650,
-        font=dict(family='Arial', size=14, color='black'),
-        xaxis=dict(showgrid=True, gridcolor='lightgray', title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
-        yaxis=dict(showgrid=True, gridcolor='lightgray', title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
+        font=dict(family='Arial', size=14, color='#003366'),
+        xaxis=dict(showgrid=True, gridcolor='lightgray', title_font=dict(color='#003366'), tickfont=dict(color='#003366'), linecolor='#003366', zerolinecolor='#003366'),
+        yaxis=dict(showgrid=True, gridcolor='lightgray', title_font=dict(color='#003366'), tickfont=dict(color='#003366'), linecolor='#003366', zerolinecolor='#003366'),
         plot_bgcolor='white',
         paper_bgcolor='white',
-        legend=dict(font=dict(color='black'))
+        legend=dict(font=dict(color='#003366'))
     )
     st.plotly_chart(fig_anomaly, use_container_width=True)
-    st.caption("This violin plot shows how arrival delays skew dissatisfaction. Longer delays especially frustrate neutral/dissatisfied travelers.")
 
 # --- Tab 5: Service Feature Correlation (Heatmap) ---
 with tabs[4]:
@@ -273,13 +269,17 @@ with tabs[4]:
         zmin=-1,
         zmax=1,
         colorscale='RdBu',
-        colorbar=dict(title='Correlation'),
+        colorbar=dict(
+            title='Correlation',
+            titleside='right',
+            thickness=15,
+            len=0.5,
+            x=1.02
+        ),
         hovertemplate='Feature 1: %{y}<br>Feature 2: %{x}<br>Correlation: %{z:.2f}<extra></extra>'
     ))
     fig_heatmap.update_layout(
         title='Interactive Correlation between Service Features',
-        xaxis_title="Service Features",
-        yaxis_title="Service Features",
         width=850,
         height=850,
         xaxis=dict(
@@ -288,31 +288,33 @@ with tabs[4]:
             zeroline=False,
             showline=False,
             ticks='',
-            tickfont=dict(size=11, color='black'),
+            tickfont=dict(size=11, color='#003366'),
             scaleanchor='y',
-            title_font=dict(color='black'),
-            linecolor='black',
-            zerolinecolor='black'
+            title_font=dict(color='#003366'),
+            linecolor='#003366',
+            zerolinecolor='#003366',
+            side='bottom',
+            constrain='domain'
         ),
         yaxis=dict(
             showgrid=False,
             zeroline=False,
             showline=False,
             ticks='',
-            tickfont=dict(size=11, color='black'),
-            title_font=dict(color='black'),
-            linecolor='black',
-            zerolinecolor='black'
+            tickfont=dict(size=11, color='#003366'),
+            title_font=dict(color='#003366'),
+            linecolor='#003366',
+            zerolinecolor='#003366',
+            side='left',
+            constrain='domain'
         ),
-        font=dict(family='Segoe UI', color='black'),
-        margin=dict(t=50, l=80, r=50, b=80),
+        font=dict(family='Segoe UI', color='#003366'),
+        margin=dict(l=0, r=80, t=50, b=50, pad=0),
         plot_bgcolor='white',
         paper_bgcolor='white',
-        transition=dict(duration=500, easing='cubic-in-out'),
-        legend=dict(font=dict(color='black'))
+        transition=dict(duration=500, easing='cubic-in-out')
     )
     st.plotly_chart(fig_heatmap, use_container_width=True)
-    st.caption("This clean heatmap shows correlations among numeric features without grid distractions.")
 
 # --- Tab 6: Travel Type to Satisfaction (Sankey Diagram) ---
 with tabs[5]:
@@ -327,7 +329,7 @@ with tabs[5]:
     node_colors = pastel_colors * (len(labels) // len(pastel_colors) + 1)
     node_colors = node_colors[:len(labels)]
     link_colors = [
-        'rgba(173, 216, 230, 0.6)' if sat.strip().lower() == 'satisfied' else 'rgba(255, 213, 128, 0.6)'
+        'rgba(255, 213, 128, 0.6)' if sat.strip().lower() == 'satisfied' else 'rgba(255, 213, 128, 0.6)'
         for sat in sankey_data['Satisfaction']
     ]
     fig_sankey = go.Figure(data=[go.Sankey(
@@ -348,18 +350,17 @@ with tabs[5]:
     )])
     fig_sankey.update_layout(
         title_text="Passenger Travel Type ➔ Satisfaction Flow",
-        font=dict(size=14, family='Arial', color='black'),
+        font=dict(size=14, family='Arial', color='#003366'),
         margin=dict(l=30, r=30, t=50, b=30),
         width=900,
         height=600,
         plot_bgcolor='white',
         paper_bgcolor='white',
-        legend=dict(font=dict(color='black')),
-        xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
-        yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black')
+        legend=dict(font=dict(color='#003366')),
+        xaxis=dict(title_font=dict(color='#003366'), tickfont=dict(color='#003366'), linecolor='#003366', zerolinecolor='#003366'),
+        yaxis=dict(title_font=dict(color='#003366'), tickfont=dict(color='#003366'), linecolor='#003366', zerolinecolor='#003366')
     )
     st.plotly_chart(fig_sankey, use_container_width=True)
-    st.caption("This Sankey diagram shows how different travel types (e.g., Business vs. Personal) influence satisfaction levels. The thicker the flow, the greater the number of passengers in that path.")
 
 # --- Tab 7: Passenger Segments (PCA + KMeans Clustering) ---
 with tabs[6]:
@@ -410,13 +411,12 @@ with tabs[6]:
     fig_pca.update_layout(
         legend_title="Passenger Segment",
         plot_bgcolor='white',
-        xaxis=dict(showgrid=False, title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
-        yaxis=dict(showgrid=False, title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
-        font=dict(color='black'),
-        legend=dict(font=dict(color='black'))
+        xaxis=dict(showgrid=False, title_font=dict(color='#003366'), tickfont=dict(color='#003366'), linecolor='#003366', zerolinecolor='#003366'),
+        yaxis=dict(showgrid=False, title_font=dict(color='#003366'), tickfont=dict(color='#003366'), linecolor='#003366', zerolinecolor='#003366'),
+        font=dict(color='#003366'),
+        legend=dict(font=dict(color='#003366'))
     )
     st.plotly_chart(fig_pca, use_container_width=True)
-    st.caption("This plot segments passengers based on service preferences and travel behavior. Clusters are created using KMeans, and reduced to 2D with PCA.")
 
 # --- Tab 8: Cluster Profiles by Service Preferences (Radar Chart) ---
 with tabs[7]:
@@ -439,16 +439,26 @@ with tabs[7]:
             ))
         fig_radar_cluster.update_layout(
             polar=dict(
-                radialaxis=dict(visible=True)
+                radialaxis=dict(
+                    visible=True,
+                    tickfont=dict(color='#003366'),
+                    linecolor='#003366',
+                    gridcolor='#e6e6e6'  # Light gray grid lines
+                ),
+                angularaxis=dict(
+                    tickfont=dict(color='#003366'),
+                    linecolor='#003366',
+                    gridcolor='#e6e6e6'  # Light gray grid lines
+                ),
+                bgcolor='white'  # White background for the polar plot
             ),
             title="Service Profile by Passenger Segment (Radar Chart)",
             width=800,
             height=600,
-            font=dict(color='black'),
+            font=dict(color='#003366'),
             template='plotly_white',
-            legend=dict(font=dict(color='black')),
-            xaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black'),
-            yaxis=dict(title_font=dict(color='black'), tickfont=dict(color='black'), linecolor='black', zerolinecolor='black')
+            legend=dict(font=dict(color='#003366')),
+            plot_bgcolor='white',
+            paper_bgcolor='white'
         )
         st.plotly_chart(fig_radar_cluster, use_container_width=True)
-        st.caption("Each radar outline represents a cluster's average rating for key service dimensions. Clear patterns show how segments differ in what they value.")
